@@ -1,24 +1,24 @@
-const { test, expect } = require("@playwright/test");
+import { expect, test, type Page } from "@playwright/test";
 
 const STORAGE_KEY = "retro_todos_v1";
 
 /**
  * Helpers to keep selectors resilient and readable.
  */
-function getNewTodoInput(page) {
+function getNewTodoInput(page: Page) {
   return page.locator("#newTodo");
 }
 
-function getTasksList(page) {
+function getTasksList(page: Page) {
   return page.getByRole("list", { name: "Tasks" });
 }
 
-function taskItemByTitle(page, title) {
+function taskItemByTitle(page: Page, title: string) {
   // Each task is an <li> containing a .todoText span with the title.
   return getTasksList(page).locator("li", { has: page.locator(".todoText", { hasText: title }) });
 }
 
-async function setFilter(page, name) {
+async function setFilter(page: Page, name: "All" | "Active" | "Completed") {
   await page.getByRole("tab", { name }).click();
 }
 
@@ -41,7 +41,7 @@ test.describe("Retro To‑Do core flows", () => {
     // Check persistence via localStorage.
     const stored = await page.evaluate((key) => window.localStorage.getItem(key), STORAGE_KEY);
     expect(stored).toBeTruthy();
-    expect(JSON.parse(stored)).toEqual(
+    expect(JSON.parse(stored as string)).toEqual(
       expect.arrayContaining([expect.objectContaining({ title: "Buy milk", completed: false })])
     );
 
@@ -70,9 +70,7 @@ test.describe("Retro To‑Do core flows", () => {
     await expect(taskItemByTitle(page, "Write draft")).toHaveCount(0);
 
     const stored = await page.evaluate((key) => JSON.parse(window.localStorage.getItem(key) || "[]"), STORAGE_KEY);
-    expect(stored).toEqual(
-      expect.arrayContaining([expect.objectContaining({ title: "Write final" })])
-    );
+    expect(stored).toEqual(expect.arrayContaining([expect.objectContaining({ title: "Write final" })]));
 
     await page.reload();
     await expect(taskItemByTitle(page, "Write final")).toBeVisible();
@@ -111,8 +109,8 @@ test.describe("Retro To‑Do core flows", () => {
 
     // Verify persistence of completed state.
     const stored = await page.evaluate((key) => JSON.parse(window.localStorage.getItem(key) || "[]"), STORAGE_KEY);
-    const storedA = stored.find((t) => t.title === "Task A");
-    const storedB = stored.find((t) => t.title === "Task B");
+    const storedA = (stored as Array<{ title: string; completed?: boolean }>).find((t) => t.title === "Task A");
+    const storedB = (stored as Array<{ title: string; completed?: boolean }>).find((t) => t.title === "Task B");
     expect(storedA?.completed).toBe(true);
     expect(storedB?.completed).toBe(false);
 
@@ -134,7 +132,7 @@ test.describe("Retro To‑Do core flows", () => {
     await expect(taskItemByTitle(page, "Disposable")).toHaveCount(0);
 
     const stored = await page.evaluate((key) => JSON.parse(window.localStorage.getItem(key) || "[]"), STORAGE_KEY);
-    expect(stored.find((t) => t.title === "Disposable")).toBeUndefined();
+    expect((stored as Array<{ title: string }>).find((t) => t.title === "Disposable")).toBeUndefined();
 
     await page.reload();
     await expect(taskItemByTitle(page, "Disposable")).toHaveCount(0);

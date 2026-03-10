@@ -1,4 +1,4 @@
-const { defineConfig, devices } = require("@playwright/test");
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * Playwright E2E config for the CRA-based to_do_frontend.
@@ -6,7 +6,7 @@ const { defineConfig, devices } = require("@playwright/test");
  * - Stores tests under ./e2e
  * - Runs Chromium by default (fast + reliable in CI).
  */
-module.exports = defineConfig({
+export default defineConfig({
   testDir: "./e2e",
   timeout: 30_000,
   expect: {
