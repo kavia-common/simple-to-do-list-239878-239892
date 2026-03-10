@@ -3,6 +3,7 @@ import App from "./App";
 
 test("renders app title", () => {
   render(<App />);
-  const title = screen.getByText(/retro to-do/i);
+  // Title uses a non-breaking hyphen (U+2011) between "To" and "Do".
+  const title = screen.getByText(/retro to[\-‑]do/i);
   expect(title).toBeInTheDocument();
 });

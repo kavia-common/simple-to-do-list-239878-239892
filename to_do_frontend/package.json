@@ -11,6 +11,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "cross-env CI=true playwright test --reporter=line",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -29,6 +31,10 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "cross-env": "^7.0.3"
   }
 }
